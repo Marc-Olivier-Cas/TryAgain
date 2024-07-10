@@ -1,43 +1,51 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UIElements;
 
-public class NewBehaviourScript : MonoBehaviour
+public class Movement : MonoBehaviour
 {
-   public float speed = 6f;
-
-   public float jumpspeed = 8f;
-
+    public float speed = 6f;
+    public float jumpSpeed = 8f;
     public float gravity = 20f;
-
-    private Vector3 moveD = Vector3.zero;
-
-    CharacterController Cac;
+    private Vector3 moveDirection = Vector3.zero;
+    private CharacterController characterController;
 
     void Start()
     {
-        Cac = GetComponent<CharacterController>();
+        characterController = GetComponent<CharacterController>();
     }
 
     void Update()
     {
-        if (Cac.isGrounded)
+        if (characterController.isGrounded)
         {
-            moveD = new Vector3(0, 0, Input.GetAxis("Vertical"));
-            moveD = transform.TransformDirection(moveD);
-            moveD *= speed;
+            // Récupérer les entrées horizontales et verticales pour permettre les déplacements diagonaux
+            float moveHorizontal = Input.GetAxis("Horizontal");
+            float moveVertical = Input.GetAxis("Vertical");
 
+            // Déterminer la direction de déplacement en tenant compte des mouvements horizontaux et verticaux
+            moveDirection = new Vector3(moveHorizontal, 0, moveVertical);
+            moveDirection = transform.TransformDirection(moveDirection);
+            moveDirection *= speed;
+
+            // Appliquer le saut
             if (Input.GetButton("Jump"))
             {
-            moveD.y = jumpspeed;
+                moveDirection.y = jumpSpeed;
             }
         }
 
-        moveD.y -= gravity * Time.deltaTime;
-        transform.Rotate(Vector3.up * Input.GetAxis("Horizontal") * Time.deltaTime * speed * 10);
-    
-        Cac.Move(moveD * Time.deltaTime);
+        // Appliquer la gravité
+        moveDirection.y -= gravity * Time.deltaTime;
+
+        // Déplacer le personnage
+        characterController.Move(moveDirection * Time.deltaTime);
+
+        // Tourner le personnage uniquement sur l'axe Y
+        float turn = Input.GetAxis("Horizontal");
+        if (turn != 0)
+        {
+            transform.Rotate(0, turn * Time.deltaTime * speed * 10, 0);
+        }
     }
 }

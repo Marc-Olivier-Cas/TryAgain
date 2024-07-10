@@ -4,14 +4,21 @@ using UnityEngine;
 
 public class Animate : MonoBehaviour
 {
-    Animator PlayerAnimator;
+    Animator playerAnimator;
 
     void Awake() {
-        PlayerAnimator = GetComponent<Animator>();
+        playerAnimator = GetComponent<Animator>();
     }
 
     void Update()
     {
-        PlayerAnimator.SetFloat("walk", Input.GetAxis("Vertical"));
+        // Récupérer les entrées horizontales et verticales pour mettre à jour les animations
+        float moveHorizontal = Input.GetAxis("Horizontal");
+        float moveVertical = Input.GetAxis("Vertical");
+
+        // Mettre à jour les animations de marche
+        playerAnimator.SetFloat("walk", Mathf.Abs(moveVertical));
+        playerAnimator.SetFloat("walkSideLeft", moveHorizontal < 0 ? Mathf.Abs(moveHorizontal) : 0);
+        playerAnimator.SetFloat("walkSideRight", moveHorizontal > 0 ? Mathf.Abs(moveHorizontal) : 0);
     }
 }
